@@ -1,0 +1,7 @@
+.compose_reactor .terminal_panel > .panel-body {
+    background-color: #000;
+}
+
+.compose_reactor .btn {
+    text-transform: initial;
+}

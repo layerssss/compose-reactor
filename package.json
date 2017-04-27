@@ -1,0 +1,43 @@
+{
+  "name": "compose-reactor",
+  "version": "0.0.7",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node bin/cli.js",
+    "dev": "nodemon --watch lib --watch bin/cli.js bin/cli.js"
+  },
+  "bin": {
+    "compose-reactor": "bin/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/layerssss/compose-reactor.git"
+  },
+  "keywords": [
+    "docker",
+    "docker-compose",
+    "react"
+  ],
+  "author": "Michael Yin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/layerssss/compose-reactor/issues"
+  },
+  "homepage": "https://github.com/layerssss/compose-reactor#readme",
+  "dependencies": {
+    "commander": "^2.9.0",
+    "express": "^4.15.2",
+    "js-yaml": "^3.8.3",
+    "lodash": "^4.17.4",
+    "node-pty": "^0.6.4",
+    "rimraf": "^2.6.1",
+    "shell-quote": "^1.6.1",
+    "strip-ansi": "^3.0.1",
+    "uuid": "^3.0.1",
+    "ws": "^2.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
