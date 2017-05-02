@@ -109,255 +109,252 @@ class ComposeReactor extends React.Component {
           Grid, {
             fluid: true
           },
-          createElement(
-            'div', {},
-            this.state.branches.map(branch =>
-              createElement(
-                Panel, {
-                  header: `${branch.repo}#${branch.branch}${branch.path && ` (${branch.path})`}`,
-                  collapsible: true
-                },
-                (branch.terminal ?
-                  createElement(
-                    XTerm, {
-                      ref: `xTerm_${branch.terminal.id}`,
-                      title: branch.terminal.title,
-                      onResize: (cols, rows) => {
-                        this.doAction('ResizeTerminal', {
-                          id: branch.terminal.id,
-                          cols,
-                          rows
-                        });
-                      },
-                      onData: dataString => {
-                        if (branch.terminal.code) {
-                          return this.doAction('DismissBranchTerminal', {
-                            id: branch.id,
-                          });
-                        }
-                        this.doAction('InputTerminal', {
-                          id: branch.terminal.id,
-                          dataString: dataString
+          this.state.branches.map(branch =>
+            createElement(
+              Panel, {
+                header: `${branch.repo}#${branch.branch}${branch.path && ` (${branch.path})`}`,
+                collapsible: true
+              },
+              (branch.terminal ?
+                createElement(
+                  XTerm, {
+                    ref: `xTerm_${branch.terminal.id}`,
+                    title: branch.terminal.title,
+                    onResize: (cols, rows) => {
+                      this.doAction('ResizeTerminal', {
+                        id: branch.terminal.id,
+                        cols,
+                        rows
+                      });
+                    },
+                    onData: dataString => {
+                      if (branch.terminal.code) {
+                        return this.doAction('DismissBranchTerminal', {
+                          id: branch.id,
                         });
                       }
+                      this.doAction('InputTerminal', {
+                        id: branch.terminal.id,
+                        dataString: dataString
+                      });
                     }
-                  ) :
-                  createElement(
-                    'div', {},
-                    (this.state[`branch${branch.id}Mode`] == 'mappingPort' &&
+                  }
+                ) :
+                createElement(
+                  'div', {},
+                  (this.state[`branch${branch.id}Mode`] == 'mappingPort' &&
+                    createElement(
+                      Panel, {
+                        header: 'Mapping port:'
+                      },
                       createElement(
-                        Panel, {
-                          header: 'Mapping port:'
-                        },
-                        createElement(
-                          MappingPort, {
-                            branch: branch,
-                            onMap: port => {
-                              this.doAction('MapPort', _.merge(port, {
-                                branchId: branch.id
-                              }));
+                        MappingPort, {
+                          branch: branch,
+                          onMap: port => {
+                            this.doAction('MapPort', _.merge(port, {
+                              branchId: branch.id
+                            }));
 
-                              this.state[`branch${branch.id}Mode`] = null;
-                              this.forceUpdate();
-                            },
-                            onCancel: () => {
-                              this.state[`branch${branch.id}Mode`] = null;
-                              this.forceUpdate();
-                            }
+                            this.state[`branch${branch.id}Mode`] = null;
+                            this.forceUpdate();
+                          },
+                          onCancel: () => {
+                            this.state[`branch${branch.id}Mode`] = null;
+                            this.forceUpdate();
                           }
-                        )
+                        }
                       )
-                    ),
-                    (this.state[`branch${branch.id}Mode`] == 'creatingRunService' &&
+                    )
+                  ),
+                  (this.state[`branch${branch.id}Mode`] == 'creatingRunService' &&
+                    createElement(
+                      Panel, {
+                        header: `Run on ${this.state.creatingRunServiceServiceName}:`
+                      },
                       createElement(
-                        Panel, {
-                          header: `Run on ${this.state.creatingRunServiceServiceName}:`
-                        },
-                        createElement(
-                          RunService, {
-                            branch: branch,
-                            serviceName: this.state.creatingRunServiceServiceName,
-                            onRunService: (command) => {
-                              this.doAction('RunService', {
-                                branchId: branch.id,
-                                serviceName: this.state.creatingRunServiceServiceName,
-                                command: command
-                              });
+                        RunService, {
+                          branch: branch,
+                          serviceName: this.state.creatingRunServiceServiceName,
+                          onRunService: (command) => {
+                            this.doAction('RunService', {
+                              branchId: branch.id,
+                              serviceName: this.state.creatingRunServiceServiceName,
+                              command: command
+                            });
 
-                              this.state[`branch${branch.id}Mode`] = null;
-                              this.forceUpdate();
-                            },
-                            onCancel: () => {
-                              this.state[`branch${branch.id}Mode`] = null;
-                              this.forceUpdate();
-                            }
+                            this.state[`branch${branch.id}Mode`] = null;
+                            this.forceUpdate();
+                          },
+                          onCancel: () => {
+                            this.state[`branch${branch.id}Mode`] = null;
+                            this.forceUpdate();
                           }
-                        )
+                        }
                       )
-                    ),
-                    (!this.state[`branch${branch.id}Mode`] &&
+                    )
+                  ),
+                  (!this.state[`branch${branch.id}Mode`] &&
+                    createElement(
+                      'div', {},
                       createElement(
-                        'div', {},
+                        Panel, {},
                         createElement(
-                          Panel, {},
+                          ButtonToolbar, {},
                           createElement(
-                            ButtonToolbar, {},
+                            Button, {
+                              bsStyle: 'primary',
+                              onClick: () => {
+                                this.doAction('UpBranch', {
+                                  id: branch.id
+                                });
+                              }
+                            },
+                            'Up'
+                          ),
+                          createElement(
+                            Button, {
+                              bsStyle: 'info',
+                              disabled: !branch.services,
+                              onClick: () => {
+                                this.doAction('DownBranch', {
+                                  id: branch.id
+                                });
+                              }
+                            },
+                            'Down'
+                          ),
+                          createElement(
+                            Button, {
+                              bsStyle: 'default',
+                              onClick: () => {
+                                this.setState({
+                                  mappingPortBranchId: branch.id
+                                });
+                                this.state[`branch${branch.id}Mode`] = 'mappingPort';
+                                this.forceUpdate();
+                              }
+                            },
+                            'Map port'
+                          ),
+                          createElement(
+                            Button, {
+                              bsStyle: 'danger',
+                              onClick: () => {
+                                this.doAction('DeleteBranch', {
+                                  id: branch.id
+                                });
+                              }
+                            },
+                            'Delete'
+                          )
+                        )
+                      ),
+                      createElement(
+                        Panel, {
+                          header: 'Port mappings:'
+                        },
+                        createElement(
+                          ButtonToolbar, {},
+                          branch.portMappings.map(portMapping =>
                             createElement(
-                              Button, {
-                                bsStyle: 'primary',
-                                onClick: () => {
-                                  this.doAction('UpBranch', {
-                                    id: branch.id
-                                  });
-                                }
+                              DropdownButton, {
+                                bsStyle: portMapping.active ? 'success' : 'warning',
+                                title: `${portMapping.protocol}: ${portMapping.publicPort} => ${portMapping.containerPort}@${portMapping.serviceName}`
                               },
-                              'Up'
-                            ),
-                            createElement(
-                              Button, {
-                                bsStyle: 'info',
-                                disabled: !branch.services,
-                                onClick: () => {
-                                  this.doAction('DownBranch', {
-                                    id: branch.id
-                                  });
-                                }
-                              },
-                              'Down'
-                            ),
-                            createElement(
-                              Button, {
-                                bsStyle: 'default',
-                                onClick: () => {
-                                  this.setState({
-                                    mappingPortBranchId: branch.id
-                                  });
-                                  this.state[`branch${branch.id}Mode`] = 'mappingPort';
-                                  this.forceUpdate();
-                                }
-                              },
-                              'Map port'
-                            ),
-                            createElement(
-                              Button, {
-                                bsStyle: 'danger',
-                                onClick: () => {
-                                  this.doAction('DeleteBranch', {
-                                    id: branch.id
-                                  });
-                                }
-                              },
-                              'Delete'
+                              createElement(
+                                MenuItem, {
+                                  onClick: () => {
+                                    this.doAction('DeletePortMapping', {
+                                      branchId: branch.id,
+                                      protocol: portMapping.protocol,
+                                      publicPort: portMapping.publicPort
+                                    });
+                                  }
+                                },
+                                'Delete'
+                              )
                             )
                           )
-                        ),
+                        )
+                      ),
+                      (branch.services &&
                         createElement(
                           Panel, {
-                            header: 'Port mappings:'
+                            header: 'Services:'
                           },
                           createElement(
                             ButtonToolbar, {},
-                            branch.portMappings.map(portMapping =>
+                            branch.services.map(service =>
                               createElement(
                                 DropdownButton, {
-                                  bsStyle: portMapping.active ? 'success' : 'warning',
-                                  title: `${portMapping.protocol}: ${portMapping.publicPort} => ${portMapping.containerPort}@${portMapping.serviceName}`
+                                  title: service.name,
+                                  key: service.name
                                 },
                                 createElement(
                                   MenuItem, {
                                     onClick: () => {
-                                      this.doAction('DeletePortMapping', {
-                                        branchId: branch.id,
-                                        protocol: portMapping.protocol,
-                                        publicPort: portMapping.publicPort
+                                      this.state[`branch${branch.id}Mode`] = 'creatingRunService';
+                                      this.setState({
+                                        creatingRunServiceServiceName: service.name
                                       });
                                     }
                                   },
-                                  'Delete'
-                                )
-                              )
-                            )
-                          )
-                        ),
-                        (branch.services &&
-                          createElement(
-                            Panel, {
-                              header: 'Services:'
-                            },
-                            createElement(
-                              ButtonToolbar, {},
-                              branch.services.map(service =>
-                                createElement(
-                                  DropdownButton, {
-                                    title: service.name,
-                                    key: service.name
-                                  },
-                                  createElement(
-                                    MenuItem, {
-                                      onClick: () => {
-                                        this.state[`branch${branch.id}Mode`] = 'creatingRunService';
-                                        this.setState({
-                                          creatingRunServiceServiceName: service.name
-                                        });
-                                      }
-                                    },
-                                    'Run'
-                                  ),
-                                  createElement(
-                                    MenuItem, {
-                                      onClick: () => {
-                                        this.doAction('LogService', {
-                                          branchId: branch.id,
-                                          serviceName: service.name
-                                        });
-                                      }
-                                    },
-                                    'Logs'
-                                  )
-                                )
-                              )
-                            )
-                          )
-                        ),
-                        (branch.volumes &&
-                          createElement(
-                            Panel, {
-                              header: 'Volumes:'
-                            },
-                            branch.volumes.map(volume =>
-                              createElement(
-                                DropdownButton, {
-                                  title: volume.name,
-                                  key: volume.name
-                                },
-                                createElement(
-                                  MenuItem, {
-                                    onClick: () => {
-                                      this.doAction('ExportVolume', {
-                                        branchId: branch.id,
-                                        volumeName: volume.name
-                                      });
-                                    }
-                                  },
-                                  'Export'
+                                  'Run'
                                 ),
                                 createElement(
                                   MenuItem, {
                                     onClick: () => {
-                                      SelectFile('.tar', file => {
-                                        this.doAction('ImportVolume', {
-                                          branchId: branch.id,
-                                          volumeName: volume.name
-                                        });
-
-                                        this.socket.send(file, {
-                                          binary: true
-                                        });
+                                      this.doAction('LogService', {
+                                        branchId: branch.id,
+                                        serviceName: service.name
                                       });
                                     }
                                   },
-                                  'Import'
+                                  'Logs'
                                 )
+                              )
+                            )
+                          )
+                        )
+                      ),
+                      (branch.volumes &&
+                        createElement(
+                          Panel, {
+                            header: 'Volumes:'
+                          },
+                          branch.volumes.map(volume =>
+                            createElement(
+                              DropdownButton, {
+                                title: volume.name,
+                                key: volume.name
+                              },
+                              createElement(
+                                MenuItem, {
+                                  onClick: () => {
+                                    this.doAction('ExportVolume', {
+                                      branchId: branch.id,
+                                      volumeName: volume.name
+                                    });
+                                  }
+                                },
+                                'Export'
+                              ),
+                              createElement(
+                                MenuItem, {
+                                  onClick: () => {
+                                    SelectFile('.tar', file => {
+                                      this.doAction('ImportVolume', {
+                                        branchId: branch.id,
+                                        volumeName: volume.name
+                                      });
+
+                                      this.socket.send(file, {
+                                        binary: true
+                                      });
+                                    });
+                                  }
+                                },
+                                'Import'
                               )
                             )
                           )
@@ -367,7 +364,12 @@ class ComposeReactor extends React.Component {
                   )
                 )
               )
-            ),
+            )
+          ),
+          createElement(
+            Panel, {
+              header: 'Creating new branch'
+            },
             (!this.state.creatingBranch ?
               createElement(
                 Button, {
@@ -380,29 +382,24 @@ class ComposeReactor extends React.Component {
                 'New branch'
               ) :
               createElement(
-                Panel, {
-                  header: 'Creating new branch'
-                },
-                createElement(
-                  NewBranch, {
-                    onCancel: () => {
-                      this.setState({
-                        creatingBranch: false
-                      });
-                    },
-                    onCreate: branchOptions => {
-                      this.setState({
-                        creatingBranch: false
-                      });
+                NewBranch, {
+                  onCancel: () => {
+                    this.setState({
+                      creatingBranch: false
+                    });
+                  },
+                  onCreate: branchOptions => {
+                    this.setState({
+                      creatingBranch: false
+                    });
 
-                      this.doAction('CreateBranch', {
-                        repo: branchOptions.repo,
-                        branch: branchOptions.branch,
-                        path: branchOptions.path,
-                      });
-                    }
+                    this.doAction('CreateBranch', {
+                      repo: branchOptions.repo,
+                      branch: branchOptions.branch,
+                      path: branchOptions.path,
+                    });
                   }
-                )
+                }
               )
             )
           )

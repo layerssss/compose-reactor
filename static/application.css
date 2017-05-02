@@ -1,3 +1,6 @@
+.compose_reactor .panel-heading {
+    overflow-x: auto;
+}
 .compose_reactor .terminal_panel > .panel-body {
     background-color: #000;
 }
