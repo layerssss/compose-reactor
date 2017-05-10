@@ -18,7 +18,7 @@ class ComposeReactor extends React.Component {
   componentDidMount() {
     var initSocket = () => {
       var receivingFile = null;
-      this.socket = new WebSocket(location.origin.replace(/^http/, 'ws'));
+      this.socket = new WebSocket(location.href.replace(/^http/, 'ws'));
 
       this.socket.onmessage = (messageEvent) => {
         if (receivingFile) {
