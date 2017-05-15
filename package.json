@@ -1,11 +1,11 @@
 {
   "name": "compose-reactor",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node bin/cli.js",
-    "dev": "nodemon --watch lib --watch bin/cli.js bin/cli.js"
+    "dev": "nodemon --watch lib --watch bin bin/cli.js"
   },
   "bin": {
     "compose-reactor": "bin/cli.js"

@@ -111,10 +111,24 @@ class ComposeReactor extends React.Component {
           },
           this.state.branches.map(branch =>
             createElement(
-              Panel, {
-                header: `${branch.repo}#${branch.branch}${branch.path && ` (${branch.path})`}`,
-                collapsible: true
-              },
+              Panel, {},
+              createElement(
+                Panel, {
+                  bsStyle: (branch.terminal ?
+                    'info' :
+                    (branch.services ? 'success' : 'warning')
+                  ),
+                  header: 'Status: ' + (branch.terminal ?
+                    'starting' :
+                    (branch.services ? 'running' : 'stopped')
+                  )
+                },
+                createElement('p', {}, `ID: ${branch.id}`),
+                createElement('p', {}, `Repository: ${branch.repo}`),
+                createElement('p', {}, `Branch: ${branch.branch}`),
+                createElement('p', {}, `Path: ${branch.path}`),
+                createElement('p', {}, `Deployed at: ${branch.deployedAt ? moment(branch.deployedAt).format('LLL') : 'NaN'}`)
+              ),
               (branch.terminal ?
                 createElement(
                   XTerm, {
@@ -322,39 +336,42 @@ class ComposeReactor extends React.Component {
                           Panel, {
                             header: 'Volumes:'
                           },
-                          branch.volumes.map(volume =>
-                            createElement(
-                              DropdownButton, {
-                                title: volume.name,
-                                key: volume.name
-                              },
+                          createElement(
+                            ButtonToolbar, {},
+                            branch.volumes.map(volume =>
                               createElement(
-                                MenuItem, {
-                                  onClick: () => {
-                                    this.doAction('ExportVolume', {
-                                      branchId: branch.id,
-                                      volumeName: volume.name
-                                    });
-                                  }
+                                DropdownButton, {
+                                  title: volume.name,
+                                  key: volume.name
                                 },
-                                'Export'
-                              ),
-                              createElement(
-                                MenuItem, {
-                                  onClick: () => {
-                                    SelectFile('.tar', file => {
-                                      this.doAction('ImportVolume', {
+                                createElement(
+                                  MenuItem, {
+                                    onClick: () => {
+                                      this.doAction('ExportVolume', {
                                         branchId: branch.id,
                                         volumeName: volume.name
                                       });
+                                    }
+                                  },
+                                  'Export'
+                                ),
+                                createElement(
+                                  MenuItem, {
+                                    onClick: () => {
+                                      SelectFile('.tar', file => {
+                                        this.doAction('ImportVolume', {
+                                          branchId: branch.id,
+                                          volumeName: volume.name
+                                        });
 
-                                      this.socket.send(file, {
-                                        binary: true
+                                        this.socket.send(file, {
+                                          binary: true
+                                        });
                                       });
-                                    });
-                                  }
-                                },
-                                'Import'
+                                    }
+                                  },
+                                  'Import'
+                                )
                               )
                             )
                           )
