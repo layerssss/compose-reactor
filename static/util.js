@@ -2,6 +2,8 @@ var {
   Alert,
   Modal,
   Navbar,
+  Nav,
+  NavItem,
   Grid,
   Col,
   Row,
